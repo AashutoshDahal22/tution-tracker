@@ -14,7 +14,7 @@ const prisma = new PrismaClient({
 export async function GET() {
   try {
     const students = await prisma.student.findMany({
-      include: { subject: false, location: false },
+      include: { location: true },
       orderBy: { name: "asc" },
     });
 
@@ -30,9 +30,9 @@ export async function GET() {
 
 export async function POST(req: Request) {
   try {
-    const { name, subjectId, locationId } = await req.json();
+    const { name, locationId, rate } = await req.json();
 
-    if (!name || !subjectId || !locationId) {
+    if (!name || !locationId || !rate) {
       return NextResponse.json(
         { error: "Name, subjectId and locationId are required" },
         { status: 400 },
@@ -40,7 +40,7 @@ export async function POST(req: Request) {
     }
 
     const student = await prisma.student.create({
-      data: { name, subjectId, locationId },
+      data: { name, locationId, rate },
     });
 
     return NextResponse.json(student);

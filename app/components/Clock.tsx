@@ -1,10 +1,20 @@
 "use client";
 
+import { useEffect } from "react";
 import { useStopwatch } from "react-timer-hook";
 
-export default function Clock() {
+interface ClockProps {
+  onRunningChange?: (running: boolean) => void;
+}
+
+export default function Clock({ onRunningChange }: ClockProps) {
   const { seconds, minutes, hours, start, pause, reset, isRunning } =
     useStopwatch({ autoStart: false });
+
+  // Notify parent whenever running state changes
+  useEffect(() => {
+    if (onRunningChange) onRunningChange(isRunning);
+  }, [isRunning, onRunningChange]);
 
   return (
     <div className="flex flex-col items-center gap-4">

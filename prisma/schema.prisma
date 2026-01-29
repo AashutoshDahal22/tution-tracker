@@ -24,17 +24,17 @@ model Subject{
   id String @id @default(uuid())
   subjectName String @unique
 
-  students Student[]
+  sessions TuitionSession[]
 }
 
 model Student {
   id        String           @id @default(uuid())
   name      String
-  subjectId   String
-  subject Subject @relation(fields:[subjectId],references:[id],onDelete:Cascade)
+  
   locationId  String
   location  Location @relation(fields:[locationId], references:[id], onDelete:Cascade)
 
+  rate    Float
   sessions TuitionSession[]
   @@index([locationId])
 }
@@ -45,14 +45,17 @@ model TuitionSession {
   date            DateTime
   startTime       DateTime
   endTime         DateTime
-  durationMinutes Int
+  durationMinutes Float
+  totalMoney      Float
+
+  subjectId   String
+  subject Subject @relation(fields:[subjectId],references:[id],onDelete:Cascade)
 
   studentId  String
-
   student  Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
-
+  
   @@index([studentId])
   @@index([date])
 }

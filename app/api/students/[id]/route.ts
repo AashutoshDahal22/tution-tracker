@@ -7,27 +7,37 @@ const adapter = new PrismaPg({
   connectionString: process.env.DATABASE_URL,
 });
 
-const prisma = new PrismaClient({
-  adapter,
-});
+const prisma = new PrismaClient({ adapter });
 
 export async function GET(
   req: Request,
-  { params }: { params: { id: string } },
+  context: { params: Promise<{ id: string }> },
 ) {
+  // unwrap the params Promise
+  const params = await context.params;
+
+  if (!params?.id) {
+    return NextResponse.json(
+      { error: "Student ID is required" },
+      { status: 400 },
+    );
+  }
+
   try {
-    const subjects = await prisma.student.findMany({
+    const student = await prisma.student.findUnique({
       where: { id: params.id },
-      include: {
-        subject: true,
-        location: true,
-      },
+      include: { location: true },
     });
-    return NextResponse.json(subjects);
+
+    if (!student) {
+      return NextResponse.json({ error: "Student not found" }, { status: 404 });
+    }
+
+    return NextResponse.json(student);
   } catch (error) {
     console.error(error);
     return NextResponse.json(
-      { error: "Failed to fetch subjects" },
+      { error: "Failed to fetch student" },
       { status: 500 },
     );
   }
