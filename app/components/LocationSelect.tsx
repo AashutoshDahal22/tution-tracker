@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 
 interface Location {
   id: string;
-  name: string;
+  locationName: string;
 }
 
 interface LocationSelectProps {
@@ -37,7 +37,7 @@ export default function LocationSelect({
         <option value="">Select</option>
         {locations.map((loc) => (
           <option key={loc.id} value={loc.id} className="dark:text-black">
-            {loc.name}
+            {loc.locationName}
           </option>
         ))}
       </select>

@@ -13,19 +13,24 @@ datasource db {
   provider = "postgresql"
 }
 
+model Location {
+  id       String           @id @default(uuid())
+  locationName     String           @unique
+
+  students Student[]
+}
+
 model Student {
   id        String           @id @default(uuid())
   name      String
-  subject   String?
-  sessions  TuitionSession[]
-  createdAt DateTime         @default(now())
+  subject   String
+  locationId  String
+  location  Location @relation(fields:[locationId], references:[id], onDelete:Cascade)
+
+  sessions TuitionSession[]
+  @@index([locationId])
 }
 
-model Location {
-  id       String           @id @default(uuid())
-  name     String
-  sessions TuitionSession[]
-}
 
 model TuitionSession {
   id              String   @id @default(uuid())
@@ -35,14 +40,11 @@ model TuitionSession {
   durationMinutes Int
 
   studentId  String
-  locationId String
 
   student  Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
-  location Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
 
   @@index([studentId])
-  @@index([locationId])
   @@index([date])
 }
