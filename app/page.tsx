@@ -3,10 +3,12 @@ import { useState } from "react";
 import Clock from "./components/Clock";
 import LocationSelect from "./components/LocationSelect";
 import SubjectSelect from "./components/SubjectSelect";
+import StudentSelect from "./components/StudentSelect";
 
 export default function Home() {
   const [location, setLocation] = useState("");
   const [subject, setSubject] = useState("");
+  const [studentId, setStudentId] = useState("");
 
   const isReady = location && subject;
 
@@ -27,6 +29,10 @@ export default function Home() {
           <SubjectSelect value={subject} onChange={setSubject} />
         </div>
 
+        <div className="p-6 flex flex-col gap-4">
+          <StudentSelect value={studentId} onChange={setStudentId} />
+          {studentId && <p>Selected Student ID: {studentId}</p>}
+        </div>
         {!isReady && (
           <p className="text-sm text-center text-gray-500 dark:text-gray-300">
             Please select location and subject to start the session
