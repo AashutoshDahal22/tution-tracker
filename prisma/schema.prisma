@@ -20,10 +20,17 @@ model Location {
   students Student[]
 }
 
+model Subject{
+  id String @id @default(uuid())
+  subjectName String @unique
+
+  students Student[]
+}
 model Student {
   id        String           @id @default(uuid())
   name      String
-  subject   String
+  subjectId   String
+  subject Subject @relation(fields:[subjectId],references:[id],onDelete:Cascade)
   locationId  String
   location  Location @relation(fields:[locationId], references:[id], onDelete:Cascade)
 

@@ -1,4 +1,5 @@
 "use client";
+
 import { useEffect, useState } from "react";
 
 interface Location {
@@ -28,15 +29,17 @@ export default function LocationSelect({
 
   return (
     <div className="flex flex-col gap-1">
-      <label>Select the location</label>
+      <label className="text-sm text-gray-600 dark:text-gray-300">
+        Select location
+      </label>
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="border rounded px-3 py-2"
+        className="border rounded px-3 py-2 text-base"
       >
         <option value="">Select</option>
         {locations.map((loc) => (
-          <option key={loc.id} value={loc.id} className="dark:text-black">
+          <option key={loc.id} value={loc.id}>
             {loc.locationName}
           </option>
         ))}
