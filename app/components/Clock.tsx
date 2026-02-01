@@ -1,20 +1,31 @@
 "use client";
-
-import { useEffect } from "react";
 import { useStopwatch } from "react-timer-hook";
 
 interface ClockProps {
   onRunningChange?: (running: boolean) => void;
+  onStop?: (stopTime: Date) => void; // called when session stops
 }
 
-export default function Clock({ onRunningChange }: ClockProps) {
+export default function Clock({ onRunningChange, onStop }: ClockProps) {
   const { seconds, minutes, hours, start, pause, reset, isRunning } =
     useStopwatch({ autoStart: false });
 
-  // Notify parent whenever running state changes
-  useEffect(() => {
-    if (onRunningChange) onRunningChange(isRunning);
-  }, [isRunning, onRunningChange]);
+  const handleStart = () => {
+    start();
+    onRunningChange?.(true);
+  };
+
+  const handlePause = () => {
+    pause(); // just pauses the timer
+    onRunningChange?.(false);
+  };
+
+  const handleStop = () => {
+    pause(); // stop timer completely
+    onRunningChange?.(false);
+    onStop?.(new Date()); // trigger stop callback
+    reset(undefined, false); // optionally reset timer after stopping
+  };
 
   return (
     <div className="flex flex-col items-center gap-4">
@@ -25,27 +36,27 @@ export default function Clock({ onRunningChange }: ClockProps) {
       </div>
 
       <div className="flex gap-3">
-        {!isRunning ? (
-          <button
-            onClick={start}
-            className="px-4 py-2 rounded bg-green-600 text-white"
-          >
-            Start
-          </button>
-        ) : (
-          <button
-            onClick={pause}
-            className="px-4 py-2 rounded bg-red-600 text-white"
-          >
-            Stop
-          </button>
-        )}
+        <button
+          onClick={handleStart}
+          disabled={isRunning}
+          className="px-4 py-2 rounded bg-green-600 text-white disabled:opacity-50"
+        >
+          Start
+        </button>
 
         <button
-          onClick={() => reset(undefined, false)}
-          className="px-4 py-2 rounded bg-gray-300 dark:bg-gray-600"
+          onClick={handlePause}
+          disabled={!isRunning}
+          className="px-4 py-2 rounded bg-yellow-500 text-white disabled:opacity-50"
         >
-          Reset
+          Pause
+        </button>
+
+        <button
+          onClick={handleStop}
+          className="px-4 py-2 rounded bg-red-600 text-white"
+        >
+          Stop
         </button>
       </div>
     </div>

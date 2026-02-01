@@ -14,9 +14,39 @@ export default function Home() {
   const subjectId = useSelector((state: RootState) => state.form.subjectId);
 
   const [timerRunning, setTimerRunning] = useState(false);
+  const [startTime, setStartTime] = useState<Date | null>(null);
 
   const handleSubjectChange = (id: string) => {
     if (!timerRunning) dispatch(setSubjectId(id));
+  };
+
+  const handleSessionStop = async (stopTime: Date) => {
+    if (!student || !subjectId || !startTime) return;
+
+    try {
+      const response = await fetch("/api/tuitions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          studentId: student.id,
+          subjectId,
+          startTime: startTime.toISOString(),
+          endTime: stopTime.toISOString(),
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        console.error("Error creating session:", data.error);
+      } else {
+        console.log("Tuition session created:", data);
+      }
+    } catch (err) {
+      console.error("Failed to call API:", err);
+    }
   };
 
   return (
@@ -27,10 +57,15 @@ export default function Home() {
         </h1>
 
         {/* Pass a callback to get running state */}
-        <Clock onRunningChange={setTimerRunning} />
+        <Clock
+          onRunningChange={(running) => {
+            setTimerRunning(running);
+            if (running) setStartTime(new Date()); // record startTime when session starts
+          }}
+          onStop={handleSessionStop}
+        />
 
         <div className="p-6 flex flex-col gap-4">
-          {/* Disable student select if timer is running */}
           <div className={timerRunning ? "pointer-events-none opacity-50" : ""}>
             <StudentSelect />
           </div>
@@ -55,7 +90,6 @@ export default function Home() {
             </div>
           )}
 
-          {/* Disable subject select if timer is running */}
           {student && (
             <div
               className={timerRunning ? "pointer-events-none opacity-50" : ""}

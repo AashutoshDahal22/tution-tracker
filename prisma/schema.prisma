@@ -45,8 +45,8 @@ model TuitionSession {
   date            DateTime
   startTime       DateTime
   endTime         DateTime
-  durationMinutes Float
-  totalMoney      Float
+  durationMinutes Decimal
+  totalMoney      Decimal
 
   subjectId   String
   subject Subject @relation(fields:[subjectId],references:[id],onDelete:Cascade)
